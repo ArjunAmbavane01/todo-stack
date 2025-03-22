@@ -47,6 +47,7 @@
     "apps/ws": {
       "name": "ws",
       "dependencies": {
+        "@repo/db": "workspace:*",
         "@types/jsonwebtoken": "^9.0.9",
         "jsonwebtoken": "^9.0.2",
       },

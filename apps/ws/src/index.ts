@@ -1,25 +1,31 @@
+import client from "@repo/db/client";
 import { serve, type ServerWebSocket } from "bun";
 import { verify, type JwtPayload } from "jsonwebtoken";
-import client from "../../../packages/db/src/client";
 
 const PORT = 8080;
 
 type WSData = {userId:string};
 
+type WSMsgType = {
+    type:"add"|"delete"|"update"|"join"|"left",
+    username?:string,
+    todoId?:string,
+    title?:string,
+    description?:string,
+    completed?:string
+};
+
 const rooms = [];
 
 const getUsername = async (userId:string) => {
     const user = await client.user.findFirst({where:{id:userId}});
-    if(user){
-        return user.username;
-    }
+    if(user) return user.username;
     return null;
 }
 
 const wss = serve({
     port: PORT,
     fetch(req, server) {
-
         try {
             const authHeader = req.headers.get("authorization");
             const token = authHeader && authHeader.startsWith('Bearer') ? authHeader.split('Bearer ')[1] : null;
@@ -41,9 +47,12 @@ const wss = serve({
                 const userId = (ws.data as WSData).userId;
                 const username = await getUsername(userId);
                 if(username){
-                    const msg = `${username} has joined the channel`;
+                    const msg = JSON.stringify({
+                        type:"join",
+                        username
+                    } as WSMsgType)
                     ws.subscribe("todo-channel");
-                    wss.publish("todo-channel", msg);
+                    ws.publish("todo-channel", msg);
                 }
                 else {
                     ws.send('User Not Found');
@@ -51,8 +60,20 @@ const wss = serve({
                 }
             }
         },
-        message(ws: ServerWebSocket, message: string) {
-            // if(message === "")
+        message(ws: ServerWebSocket, message:string) {
+            ws.publish("todo-channel", JSON.stringify(message));
+        },
+        async close(ws:ServerWebSocket){
+            if(ws.data){
+                const userId = (ws.data as WSData).userId;
+                const username = await getUsername(userId);
+                const msg = JSON.stringify({
+                    type:"left",
+                    username
+                } as WSMsgType)
+                ws.publish("the-group-chat", msg);
+                ws.unsubscribe("the-group-chat");
+            }
         }
     },
 });

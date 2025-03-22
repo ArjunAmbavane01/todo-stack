@@ -15,6 +15,18 @@ export const getTodos = async (req: Request) => {
     }
 }
 
+export const getChannelTodos = async (req: Request) => {
+    try {
+        const userId = (req as { userId?: string }).userId;
+        const todos = await client.todo.findMany({where:{NOT:{id:userId}}})
+        if (todos.length === 0) return Response.json({ type: "success", message: "User does not have any todos", todos }, { status: 200 })
+
+        return Response.json({ type: "success", message: "Channel Todos", todos, }, { status: 200 })
+    } catch (e) {
+        return Response.json({ type: "error", message: "Internal Server Error" }, { status: 500 })
+    }
+}
+
 export const addTodo = async (req: Request) => {
     try {
         const userId = (req as { userId?: string }).userId as string;
