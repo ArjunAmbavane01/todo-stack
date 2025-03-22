@@ -3,6 +3,8 @@ import { verify } from 'jsonwebtoken';
 import { handleLogin, handleSignup } from "./controllers/AuthControllers";
 import { addTodo, deleteTodo, getTodos, updateTodo } from "./controllers/TodoController";
 
+const PORT = 3001;
+
 const authMiddleware = (req: Request, next: (req: Request) => Promise<Response>) => {
     const authHeader = req.headers.get("authorization");
     if (authHeader) {
@@ -26,7 +28,7 @@ const authMiddleware = (req: Request, next: (req: Request) => Promise<Response>)
 }
 
 const server = serve({
-    port: 3001,
+    port: PORT,
     routes: {
         "/": new Response('Hello from API'),
         "/signup": { POST: handleSignup },

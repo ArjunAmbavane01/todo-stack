@@ -46,6 +46,10 @@
     },
     "apps/ws": {
       "name": "ws",
+      "dependencies": {
+        "@types/jsonwebtoken": "^9.0.9",
+        "jsonwebtoken": "^9.0.2",
+      },
       "devDependencies": {
         "@types/bun": "latest",
       },

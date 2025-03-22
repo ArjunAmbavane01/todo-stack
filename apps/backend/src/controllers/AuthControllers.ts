@@ -29,7 +29,7 @@ export const handleLogin = async (req:Request) => {
         if(!verifyPass) return Response.json({ type: "error", message: "Wrong Password" }, { status: 401 })
         
         const jwtToken = sign({userId:user.id},process.env.JWT_SECRET_KEY as string)
-        return Response.json({ type: "success", message: "User Login Successful", token: jwtToken }, { status: 200 })
+        return Response.json({ type: "success", message: "User Login Successful", token: jwtToken, username:user.username }, { status: 200 })
     } catch (e) {
         return Response.json({ type: "error", message: "Internal Server Error" }, { status: 500 })
     }
