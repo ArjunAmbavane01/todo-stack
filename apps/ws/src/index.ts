@@ -29,7 +29,7 @@ const wss = serve({
         try {
             const authHeader = req.headers.get("authorization");
             const token = authHeader && authHeader.startsWith('Bearer') ? authHeader.split('Bearer ')[1] : null;
-            const payload = token && verify(token, process.env.JWT_SECRET_KEY as string) as JwtPayload;
+            const payload = token && verify(token, process.env.JWT_SECRET_KEY!) as JwtPayload;
             if(payload){
                 if (server.upgrade(req, {
                     data: { userId:payload.userId } as WSData

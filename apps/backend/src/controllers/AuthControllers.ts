@@ -1,5 +1,6 @@
 import client from "@repo/db/client";
 import {sign} from 'jsonwebtoken';
+import { withCORS } from "..";
 
 export const handleSignup = async (req:Request) => {
     try {
@@ -21,14 +22,14 @@ export const handleLogin = async (req:Request) => {
         const { username, password } = body as { username: string, password: string };
 
         const user = await client.user.findFirst({ where: {username} })
-        if(!user) return Response.json({ type: "error", message: "User Not Found" }, { status: 404 })
+        if(!user) return withCORS(Response.json({ type: "error", message: "User Not Found" }, { status: 404 }))
         
         const verifyPass = await Bun.password.verify(password,user.password);
-        if(!verifyPass) return Response.json({ type: "error", message: "Wrong Password" }, { status: 401 })
+        if(!verifyPass) return withCORS(Response.json({ type: "error", message: "Wrong Password" }, { status: 401 }))
         
-        const jwtToken = sign({userId:user.id},process.env.JWT_SECRET_KEY as string)
-        return Response.json({ type: "success", message: "User Login Successful", token: jwtToken, username:user.username }, { status: 200 })
+        const jwtToken = sign({userId:user.id},process.env.JWT_SECRET_KEY!)
+        return withCORS(Response.json({ type: "success", message: "User Login Successful", token: jwtToken, username:user.username }, { status: 200 }))
     } catch (e) {
-        return Response.json({ type: "error", message: "Internal Server Error" }, { status: 500 })
+        return withCORS(Response.json({ type: "error", message: "Internal Server Error" }, { status: 500 }))
     }
 }
