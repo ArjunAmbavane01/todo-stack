@@ -1,17 +1,13 @@
-'use server'
-import { cookies } from "next/headers"
-
-export async function signUp(name: string, email: string, password: string) {
+export async function signUp(username: string, password: string) {
     try {
 
         const response = await fetch('http://localhost:3001/signup', {
             method: 'POST',
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username, password }),
             headers: {
                 'Content-Type': 'application/json',
             },
         });
-
         return { success: true }
     } catch (error) {
         console.error("Sign up error:", error)
@@ -19,8 +15,8 @@ export async function signUp(name: string, email: string, password: string) {
     }
 }
 
-// export async function signOut() {
-//   cookies().delete("auth-token")
-//   return { success: true }
-// }
+export async function signOut() {
+  localStorage.setItem('auth-token','');
+  return { success: true }
+}
 

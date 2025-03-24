@@ -2,6 +2,7 @@ import { serve } from "bun";
 import { verify } from 'jsonwebtoken';
 import { handleLogin, handleSignup } from "./controllers/AuthControllers";
 import { addTodo, deleteTodo, getTodos, updateTodo } from "./controllers/TodoController";
+import { handleGetUsername } from "./controllers/UserController";
 
 const PORT = 3001;
 
@@ -28,7 +29,7 @@ const authMiddleware = (req: Request, next: (req: Request) => Promise<Response>)
 }
 
 export function withCORS(response: Response): Response {
-    response.headers.set("Access-Control-Allow-Origin", "*"); // or restrict to specific origin
+    response.headers.set("Access-Control-Allow-Origin", "*");
     response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
     response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     return response;
@@ -38,10 +39,17 @@ const server = serve({
     port: PORT,
     routes: {
         "/": new Response('Hello from API'),
-        "/signup": { POST: handleSignup },
+        "/signup": { 
+            OPTIONS: () => withCORS(new Response(null, { status: 204 })),
+            POST: handleSignup
+         },
         "/login": {
             OPTIONS: () => withCORS(new Response(null, { status: 204 })),
             POST: handleLogin
+        },
+        "/user": {
+            OPTIONS: () => withCORS(new Response(null, { status: 204 })),
+            POST: handleGetUsername
         },
         "/user/todos": {
             GET: (req) => authMiddleware(req, getTodos),

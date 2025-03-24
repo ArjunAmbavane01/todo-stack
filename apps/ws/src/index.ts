@@ -27,8 +27,7 @@ const wss = serve({
     port: PORT,
     fetch(req, server) {
         try {
-            const authHeader = req.headers.get("authorization");
-            const token = authHeader && authHeader.startsWith('Bearer') ? authHeader.split('Bearer ')[1] : null;
+            const token = req.url.split("token=")[1];
             const payload = token && verify(token, process.env.JWT_SECRET_KEY!) as JwtPayload;
             if(payload){
                 if (server.upgrade(req, {
@@ -71,8 +70,8 @@ const wss = serve({
                     type:"left",
                     username
                 } as WSMsgType)
-                ws.publish("the-group-chat", msg);
-                ws.unsubscribe("the-group-chat");
+                ws.publish("todo-channel", msg);
+                ws.unsubscribe("todo-channel");
             }
         }
     },

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -13,23 +13,35 @@ export type Todo = {
   id: string
   title: string
   description: string
+  userId: string
   username: string
   completed: boolean
   createdAt: string
 }
 
 interface TodoListProps {
-  initialTodos: Todo[]
   currentUser: string
   showAddButton?: boolean
   title?: string
 }
 
-export default function TodoList({ initialTodos, currentUser, showAddButton = true, title = "Tasks" }: TodoListProps) {
-  const [todos, setTodos] = useState<Todo[]>(initialTodos)
+export default function TodoList({ currentUser, showAddButton = true, title = "Tasks" }: TodoListProps) {
+  const [todos, setTodos] = useState<Todo[]>([])
   const [newTodo, setNewTodo] = useState({ title: "", description: "" })
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
   const [isAdding, setIsAdding] = useState(false)
+
+  useEffect(()=>{
+    const getUserTodos = async()=>{
+      const res = await fetch('http://localhost:3001/user/todos',{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem('auth-token')}`
+        }
+      })
+      const message = res.json();
+
+    }
+  },[])
 
   const handleAddTodo = () => {
     if (!newTodo.title.trim()) return

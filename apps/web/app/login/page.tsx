@@ -20,30 +20,21 @@ export default function LoginForm() {
     setError("")
 
     const formData = new FormData(event.currentTarget)
-    const email = formData.get("username") as string
+    const username = formData.get("username") as string
     const password = formData.get("password") as string
 
     try {
       const response = await fetch('http://localhost:3001/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
         headers: {
           'Content-Type': 'application/json',
         },
       });
-
       const data = await response.json();
 
-      if (data.token) {
-        // Store JWT in httpOnly cookie via API route
-        await fetch('/api/set-token', {
-            method: 'POST',
-            body: JSON.stringify({ token: data.token }),
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
       if (data.type == "success") {
+        localStorage.setItem('auth-token',data.token);
         router.push("/dashboard")
         router.refresh()
       } else {
@@ -78,13 +69,13 @@ export default function LoginForm() {
             </div>
             <Input id="password" name="password" type="password" required disabled={isLoading} />
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full hover:cursor-pointer" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
         <div className="text-center text-sm">
           Don't have an account?{" "}
-          <Link href="/signup" className="font-medium text-primary hover:underline">
+          <Link href="/signup" className="font-medium text-primary hover:underline hover:cursor-pointer">
             Sign up
           </Link>
         </div>

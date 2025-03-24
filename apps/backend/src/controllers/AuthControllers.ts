@@ -9,10 +9,9 @@ export const handleSignup = async (req:Request) => {
 
         const hashedPassword = await Bun.password.hash(password);
         await client.user.create({ data: {username,password:hashedPassword} })
-
-        return Response.json({ type: "success", message: "User Signup Successful" }, { status: 200 })
+        return withCORS(Response.json({ type: "success", message: "User Signup Successful" }, { status: 200 }));
     } catch (e) {
-        return Response.json({ type: "error", message: "Internal Server Error" }, { status: 500 })
+        return withCORS(Response.json({ type: "error", message: "Internal Server Error" }, { status: 500 }));
     }
 }
 

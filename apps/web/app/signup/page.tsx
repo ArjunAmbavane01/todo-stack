@@ -20,12 +20,11 @@ export default function SignupForm() {
     setError("")
 
     const formData = new FormData(event.currentTarget)
-    const name = formData.get("name") as string
-    const email = formData.get("email") as string
+    const username = formData.get("username") as string
     const password = formData.get("password") as string
 
     try {
-      const result = await signUp(name, email, password)
+      const result = await signUp(username, password)
       if (result.success) {
         router.push("/dashboard")
         router.refresh()
@@ -40,26 +39,28 @@ export default function SignupForm() {
   }
 
   return (
-    <div className="space-y-6 bg-card p-6 rounded-lg shadow-md">
+    <section className="w-full h-screen flex justify-center items-center">
+
+    <div className="space-y-6 bg-card p-6 rounded-lg shadow-md w-xl">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <div className="p-3 text-sm bg-destructive/10 text-destructive rounded-md">{error}</div>}
         <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" placeholder="John Doe" required disabled={isLoading} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" placeholder="name@example.com" required disabled={isLoading} />
+          <Label htmlFor="username">Username</Label>
+          <Input id="username" name="username" placeholder="John Doe" required disabled={isLoading} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <Input id="password" name="password" type="password" required disabled={isLoading} />
         </div>
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full hover:cursor-pointer" disabled={isLoading}>
           {isLoading ? "Creating account..." : "Create Account"}
         </Button>
+        <div className="text-center text-md text-slate-600 hover:cursor-pointer" onClick={()=>{
+          router.push('/login');
+        }}>Already have a Account ?</div>
       </form>
     </div>
+    </section>
   )
 }
 

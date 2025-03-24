@@ -1,16 +1,6 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client"
+import Dashboard from "./dashboard/page";
 
-export default async function Home() {
-  const cookie = await cookies();
-  const token = cookie.get("auth-token")?.value;
-
-  if (!token) {
-    redirect("/login");
-  }
-  try {
-    redirect("/dashboard");
-  } catch {
-    redirect("/login");
-  }
+export default function Home() {
+  return <Dashboard />
 }

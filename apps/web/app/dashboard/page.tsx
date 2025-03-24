@@ -1,76 +1,74 @@
+"use client"
 import TodoList from "@/components/TodoList"
 import ChannelSelector from "@/components/ChannelSelector"
 import ConnectedUsers from "@/components/ConnectedUsers"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
-
-// Mock data for UI demonstration
-const mockTodos = [
-  {
-    id: "1",
-    title: "Complete project proposal",
-    description: "Finish the proposal document for the new client project",
-    username: "John Doe",
-    completed: false,
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-  },
-  {
-    id: "2",
-    title: "Review pull requests",
-    description: "Check and approve team members' code changes",
-    username: "John Doe",
-    completed: true,
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: "3",
-    title: "Prepare for meeting",
-    description: "Create slides for tomorrow's client presentation",
-    username: "Jane Smith",
-    completed: false,
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-  },
-  {
-    id: "4",
-    title: "Update documentation",
-    description: "Update the API documentation with new endpoints",
-    username: "Alex Johnson",
-    completed: false,
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-  },
-  {
-    id: "5",
-    title: "Fix login bug",
-    description: "Address the authentication issue reported by users",
-    username: "Sarah Williams",
-    completed: true,
-    createdAt: new Date(Date.now() - 259200000).toISOString(),
-  },
-]
-
-// Mock connected users
-const connectedUsers = [
-  { id: "1", name: "John Doe", status: "active", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: "2", name: "Jane Smith", status: "active", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: "3", name: "Alex Johnson", status: "idle", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: "4", name: "Sarah Williams", status: "active", avatar: "/placeholder.svg?height=40&width=40" },
-]
+import { useRouter } from "next/navigation"
+import { signOut } from "@/lib/auth"
+import { useEffect, useRef, useState } from "react"
 
 export default function Dashboard() {
-  const currentUser = "John Doe"
-  const myTodos = mockTodos.filter((todo) => todo.username === currentUser)
-  const teamTodos = mockTodos.filter((todo) => todo.username !== currentUser)
 
+  const [username, setUsername] = useState('');
+  const [connectedUsers,setConnectedUsers] = useState<string[]>([]);
+  const socketRef = useRef<WebSocket|null>(null);
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem('auth-token');
+    if (!token) {
+      router.push('/login');
+    }
+    const getUsername = async () => {
+      const res = await fetch('http://localhost:3001/user', {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('auth-token')}`,
+        },
+      })
+      const data = await res.json();
+      const username = (data.username as string).toUpperCase();
+      setUsername(username);
+    }
+    getUsername();
+  }, [])
+
+  useEffect(()=>{
+    const token = localStorage.getItem('auth-token');
+    if(token){
+      const socket = new WebSocket(`ws://localhost:8080?token=${token}`)
+      console.log('hello')
+      console.log(socket)
+      socket.addEventListener('message',handleMessage)
+      socketRef.current = socket;
+    }
+
+    return ()=>{
+      socketRef.current?.removeEventListener('message',handleMessage)
+    }
+  },[])
+
+  const handleMessage = (msg:MessageEvent)=>{
+    const message = JSON.parse(msg.data);
+    console.log(message)
+    if(message.type === 'join'){
+      setConnectedUsers([...connectedUsers,message.username]);
+    }
+    if(message.type === 'left'){
+      const newConnectedUsers = connectedUsers.filter((name)=>name==message.username);
+      setConnectedUsers([...newConnectedUsers]);
+    }
+  }
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container mx-auto py-4 px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">TaskSync</h1>
           <div className="flex items-center gap-4">
-            <span className="text-muted-foreground">{currentUser}</span>
+            <span className="text-muted-foreground">{username}</span>
             <Link href="/">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="hover:cursor-pointer" onClick={async ()=>await signOut()}>
                 Sign Out
               </Button>
             </Link>
@@ -98,7 +96,7 @@ export default function Dashboard() {
           <div className="lg:col-span-3 space-y-8">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">Welcome back, {currentUser}</p>
+              <p className="text-muted-foreground">Welcome back, {username}</p>
             </div>
 
             <Tabs defaultValue="my-tasks" className="w-full">
@@ -108,12 +106,12 @@ export default function Dashboard() {
               </TabsList>
 
               <TabsContent value="my-tasks" className="space-y-4">
-                <TodoList initialTodos={myTodos} currentUser={currentUser} showAddButton={true} title="My Tasks" />
+                <TodoList currentUser={username} showAddButton={true} title="My Tasks" />
               </TabsContent>
 
-              <TabsContent value="team-tasks" className="space-y-4">
+              {/* <TabsContent value="team-tasks" className="space-y-4">
                 <TodoList initialTodos={teamTodos} currentUser={currentUser} showAddButton={false} title="Team Tasks" />
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </div>
         </div>
