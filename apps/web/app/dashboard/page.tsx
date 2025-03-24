@@ -38,8 +38,6 @@ export default function Dashboard() {
     const token = localStorage.getItem('auth-token');
     if(token){
       const socket = new WebSocket(`ws://localhost:8080?token=${token}`)
-      console.log('hello')
-      console.log(socket)
       socket.addEventListener('message',handleMessage)
       socketRef.current = socket;
     }

@@ -1,7 +1,7 @@
 import { serve } from "bun";
 import { verify } from 'jsonwebtoken';
 import { handleLogin, handleSignup } from "./controllers/AuthControllers";
-import { addTodo, deleteTodo, getTodos, updateTodo } from "./controllers/TodoController";
+import { addTodo, deleteTodo, getChannelTodos, getTodos, updateTodo } from "./controllers/TodoController";
 import { handleGetUsername } from "./controllers/UserController";
 
 const PORT = 3001;
@@ -52,10 +52,15 @@ const server = serve({
             POST: handleGetUsername
         },
         "/user/todos": {
+            OPTIONS: () => withCORS(new Response(null, { status: 204 })),
             GET: (req) => authMiddleware(req, getTodos),
             POST: (req) => authMiddleware(req, addTodo),
             DELETE: (req) => authMiddleware(req, deleteTodo),
             PATCH: (req) => authMiddleware(req, updateTodo)
+        },
+        "/channel/todos": {
+            OPTIONS: () => withCORS(new Response(null, { status: 204 })),
+            GET: (req) => authMiddleware(req, getChannelTodos),
         }
     }
 })

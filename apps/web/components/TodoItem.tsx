@@ -91,7 +91,6 @@ export default function TodoItem({
             id={`todo-${todo.id}`}
             checked={todo.completed}
             onCheckedChange={onToggleComplete}
-            disabled={!isCurrentUser}
             className="mt-1"
           />
           <div className="flex-1 space-y-1">

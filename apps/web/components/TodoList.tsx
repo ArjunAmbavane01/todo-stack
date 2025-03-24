@@ -13,7 +13,6 @@ export type Todo = {
   id: string
   title: string
   description: string
-  userId: string
   username: string
   completed: boolean
   createdAt: string
@@ -38,26 +37,37 @@ export default function TodoList({ currentUser, showAddButton = true, title = "T
           Authorization:`Bearer ${localStorage.getItem('auth-token')}`
         }
       })
-      const message = res.json();
-
+      const data = await res.json();
+      setTodos([...data.todos]);
     }
+    getUserTodos();
   },[])
 
-  const handleAddTodo = () => {
+  const handleAddTodo = async () => {
     if (!newTodo.title.trim()) return
 
-    const todo: Todo = {
-      id: Date.now().toString(),
-      title: newTodo.title,
-      description: newTodo.description,
-      username: currentUser,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    }
+    const res = await fetch('http://localhost:3001/user/todos',{
+      method:"POST",
+      body: JSON.stringify({ title:newTodo.title,description:newTodo.description }),
+      headers:{
+        Authorization:`Bearer ${localStorage.getItem('auth-token')}`
+      }
+    })
+    const data = await res.json();
 
-    setTodos([todo, ...todos])
-    setNewTodo({ title: "", description: "" })
-    setIsAdding(false)
+    if(data.type='sucess'){
+      const todo: Todo = {
+        id: data.todoId,
+        title: newTodo.title,
+        description: newTodo.description,
+        username: currentUser,
+        completed: false,
+        createdAt: new Date().toISOString(),
+      }
+      setTodos([todo, ...todos])
+      setNewTodo({ title: "", description: "" })
+      setIsAdding(false)
+    }
   }
 
   const handleUpdateTodo = (updatedTodo: Todo) => {
@@ -65,8 +75,19 @@ export default function TodoList({ currentUser, showAddButton = true, title = "T
     setEditingTodo(null)
   }
 
-  const handleDeleteTodo = (id: string) => {
-    setTodos(todos.filter((todo) => todo.id !== id))
+  const handleDeleteTodo = async(id: string) => {
+    const res = await fetch('http://localhost:3001/user/todos',{
+      method:"DELETE",
+      body: JSON.stringify({ todoId:id }),
+      headers:{
+        Authorization:`Bearer ${localStorage.getItem('auth-token')}`
+      }
+    })
+    const data = await res.json();
+    if(data.type=='success'){
+      setTodos(todos.filter((todo) => todo.id !== id))
+    }
+
   }
 
   const handleToggleComplete = (todo: Todo) => {
