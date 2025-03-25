@@ -24,6 +24,8 @@ jobs:
                 file: ./docker/Dockerfile.backend
                 push: true
                 tags: arjunambavane/todo-stack-backend:${{ github.sha }}
+            - name: Debug SSH Key
+              run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l    
 
             - name: Deploy to VM
               uses: appleboy/ssh-action@v1.2.2
