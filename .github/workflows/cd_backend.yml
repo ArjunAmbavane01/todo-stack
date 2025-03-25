@@ -23,4 +23,4 @@ jobs:
                 context: .
                 file: ./docker/Dockerfile.backend
                 push: true
-                tags: 100xdevs/user-app-backend:${{ github.sha }}
+                tags: arjunambavane/todo-stack-backend:${{ github.sha }}
