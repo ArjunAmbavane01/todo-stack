@@ -38,7 +38,7 @@ export function withCORS(response: Response): Response {
 const server = serve({
     port: PORT,
     routes: {
-        "/": new Response('Hello from API'),
+        "/": new Response('Hello from Backend API'),
         "/signup": { 
             OPTIONS: () => withCORS(new Response(null, { status: 204 })),
             POST: handleSignup
