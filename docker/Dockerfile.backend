@@ -9,7 +9,7 @@ COPY ./packages ./packages
 COPY ./apps/backend ./apps/backend
 
 RUN bun install
-RUN bun run db:migrate
+RUN bun run db:generate
 
 EXPOSE 3001
 

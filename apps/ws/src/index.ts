@@ -2,7 +2,7 @@ import client from "@repo/db/client";
 import { serve, type ServerWebSocket } from "bun";
 import { verify, type JwtPayload } from "jsonwebtoken";
 
-const PORT = 8080;
+const PORT = 3002;
 
 type WSData = {userId:string};
 
