@@ -8,13 +8,17 @@ jobs:
     steps:
 
       - name: Debug SSH Key
-        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l 
-        
+        run: echo "${{ secrets.SSH }}" | wc -l 
+
       - name: Test SSH Connection
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH }}
           port: 22
-          script: ssh -vvv ubuntu@165.232.188.221
+          script: |
+            echo "SSH connection successful!"
+            whoami
+            hostname
+            ls -lah
