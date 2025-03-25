@@ -25,12 +25,12 @@ jobs:
                 push: true
                 tags: arjunambavane/todo-stack-ws:${{ github.sha }}
 
-            - name: Deploy to VM
-              uses: appleboy/ssh-action@v1.2.2
-              with:
-                host: ${{ secrets.HOST }}
-                username: ${{ secrets.USERNAME }}   
-                key: ${{ secrets.SSH_PRIVATE_KEY }}
-                port: 22
-                script: |
-                  "docker stop user_ws && docker run --name user_ws -d -p 3002:3002 arjunambavane/todo-stack-ws:${{ github.sha }}"
+            # - name: Deploy to VM
+            #   uses: appleboy/ssh-action@v1.2.2
+            #   with:
+            #     host: ${{ secrets.HOST }}
+            #     username: ${{ secrets.USERNAME }}   
+            #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+            #     port: 22
+            #     script: |
+            #       "docker stop user_ws && docker run --name user_ws -d -p 3002:3002 arjunambavane/todo-stack-ws:${{ github.sha }}"

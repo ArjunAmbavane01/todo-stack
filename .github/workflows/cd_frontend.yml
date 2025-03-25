@@ -17,12 +17,12 @@ jobs:
                 username: ${{ secrets.DOCKERHUB_USERNAME }}
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
             
-            - name: Build and push to dockerhub
-              uses: docker/build-push-action@v4
-              with:
-                context: .
-                file: ./docker/Dockerfile.frontend
-                build_args:
-                  - DATABASE_URL=${{secrets.DATABASE_URL}}
-                push: true
-                tags: arjunambavane/todo-stack-frontend:${{ github.sha }}
+            # - name: Build and push to dockerhub
+            #   uses: docker/build-push-action@v4
+            #   with:
+            #     context: .
+            #     file: ./docker/Dockerfile.frontend
+            #     build_args:
+            #       - DATABASE_URL=${{secrets.DATABASE_URL}}
+            #     push: true
+            #     tags: arjunambavane/todo-stack-frontend:${{ github.sha }}
