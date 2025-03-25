@@ -1,38 +1,38 @@
-name: Deploy Backend
-on:
-    push:
-        branches: [main]
-jobs:
-    build-image:
-        name: Build Docker Images
-        runs-on: Ubuntu-latest
+# name: Deploy Backend
+# on:
+#     push:
+#         branches: [main]
+# jobs:
+#     build-image:
+#         name: Build Docker Images
+#         runs-on: Ubuntu-latest
 
-        steps:
-            - name: Checkout the code
-              uses: actions/checkout@v2
+#         steps:
+#             - name: Checkout the code
+#               uses: actions/checkout@v2
 
-            - name: Docker login
-              uses: docker/login-action@v2
-              with:
-                username: ${{ secrets.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
+#             - name: Docker login
+#               uses: docker/login-action@v2
+#               with:
+#                 username: ${{ secrets.DOCKERHUB_USERNAME }}
+#                 password: ${{ secrets.DOCKERHUB_TOKEN }}
             
-            - name: Build and push to dockerhub
-              uses: docker/build-push-action@v4
-              with:
-                context: .
-                file: ./docker/Dockerfile.backend
-                push: true
-                tags: arjunambavane/todo-stack-backend:${{ github.sha }}
-            - name: Debug SSH Key
-              run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l    
+#             - name: Build and push to dockerhub
+#               uses: docker/build-push-action@v4
+#               with:
+#                 context: .
+#                 file: ./docker/Dockerfile.backend
+#                 push: true
+#                 tags: arjunambavane/todo-stack-backend:${{ github.sha }}
+#             - name: Debug SSH Key
+#               run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l    
 
-            - name: Deploy to VM
-              uses: appleboy/ssh-action@v1.2.2
-              with:
-                host: ${{ secrets.HOST }}
-                username: ${{ secrets.USERNAME }}   
-                key: ${{ secrets.SSH_PRIVATE_KEY }}
-                port: 22
-                script: |
-                  "docker stop user_backend && docker run --name user_backend -d -p 3001:3001 arjunambavane/todo-stack-backend:${{ github.sha }}"
+#             - name: Deploy to VM
+#               uses: appleboy/ssh-action@v1.2.2
+#               with:
+#                 host: ${{ secrets.HOST }}
+#                 username: ${{ secrets.USERNAME }}   
+#                 key: ${{ secrets.SSH_PRIVATE_KEY }}
+#                 port: 22
+#                 script: |
+#                   docker stop user_backend && docker run --name user_backend -d -p 3001:3001 arjunambavane/todo-stack-backend:${{ github.sha }}

@@ -1,0 +1,20 @@
+name: Test SSH Connection
+on:
+    push:
+        branches: [main]  
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Debug SSH Key
+        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l 
+        
+      - name: Test SSH Connection
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: ssh -vvv ubuntu@165.232.188.221
